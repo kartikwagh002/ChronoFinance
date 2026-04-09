@@ -108,6 +108,20 @@
     <p>{{ savings_progress|round(1) }}% completed</p>
 </div>
 
+<div class="smart-suggestions-box">
+    <h3>Smart Suggestions</h3>
+
+    {% if suggestions %}
+        <ul class="suggestion-list">
+            {% for suggestion in suggestions %}
+                <li>{{ suggestion }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No suggestions available right now.</p>
+    {% endif %}
+</div>
+
 <div class="mini-stats-row">
     <div class="mini-stat-box">
         <span class="mini-label">Income Status</span>
@@ -149,6 +163,18 @@
     </div>
 </div>
 
+<div class="chart-grid">
+    <div class="chart-card">
+        <h3>Expense by Category</h3>
+        <canvas id="categoryChart"></canvas>
+    </div>
+
+    <div class="chart-card">
+        <h3>This Month Overview</h3>
+        <canvas id="overviewChart"></canvas>
+    </div>
+</div>
+
 <div class="quick-actions-panel">
     <h2 class="section-title">Quick Actions</h2>
     <div class="action-row">
@@ -158,6 +184,7 @@
         <a class="btn btn-secondary" href="/history">View History</a>
         <a class="btn btn-secondary" href="/monthly-report">Monthly Report</a>
         <a class="btn btn-secondary" href="/category-report">Category Report</a>
+        <a class="btn btn-secondary" href="/settings">Settings</a>
     </div>
 </div>
 
@@ -225,4 +252,58 @@
     No transactions yet. Add your first transaction to get started.
 </div>
 {% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const categoryLabels = {{ category_labels | tojson }};
+    const categoryValues = {{ category_values | tojson }};
+    const overviewLabels = {{ overview_labels | tojson }};
+    const overviewValues = {{ overview_values | tojson }};
+
+    const categoryCanvas = document.getElementById("categoryChart");
+    if (categoryCanvas) {
+        new Chart(categoryCanvas, {
+            type: "pie",
+            data: {
+                labels: categoryLabels,
+                datasets: [{
+                    data: categoryValues,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: "bottom"
+                    }
+                }
+            }
+        });
+    }
+
+    const overviewCanvas = document.getElementById("overviewChart");
+    if (overviewCanvas) {
+        new Chart(overviewCanvas, {
+            type: "bar",
+            data: {
+                labels: overviewLabels,
+                datasets: [{
+                    label: "Amount",
+                    data: overviewValues,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+</script>
 {% endblock %}
