@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Transaction History</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="navbar">
+        <h2>ChronoFinance</h2>
+        <div class="nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/transactions">Transactions</a>
+            <a href="/logout">Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Transaction History</h2>
+        <p class="page-subtitle">See all insert, update, and delete actions stored by the system</p>
+
+        <div class="menu-links">
+            <a href="/dashboard">Back to Dashboard</a>
+            <a href="/transactions">View Transactions</a>
+        </div>
+
+        {% if history_records %}
+            <table>
+                <tr>
+                    <th>History ID</th>
+                    <th>Transaction ID</th>
+                    <th>Type</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                    <th>Description</th>
+                    <th>Transaction Date</th>
+                    <th>Action</th>
+                    <th>Changed At</th>
+                </tr>
+
+                {% for h in history_records %}
+                <tr>
+                    <td>{{ h.history_id }}</td>
+                    <td>{{ h.transaction_id }}</td>
+
+                    <td>
+                        {% if h.transaction_type == 'Income' %}
+                            <span class="badge badge-income">Income</span>
+                        {% else %}
+                            <span class="badge badge-expense">Expense</span>
+                        {% endif %}
+                    </td>
+
+                    <td>{{ h.category_name }}</td>
+
+                    <td>
+                        {% if h.transaction_type == 'Income' %}
+                            + ₹ {{ h.amount }}
+                        {% else %}
+                            - ₹ {{ h.amount }}
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if h.description %}
+                            {{ h.description }}
+                        {% else %}
+                            <span style="color: #6b7280;">No description</span>
+                        {% endif %}
+                    </td>
+
+                    <td>{{ h.transaction_date }}</td>
+                    <td>{{ h.action_type }}</td>
+                    <td>{{ h.changed_at }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <div class="info-card">
+                No history records found.
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="footer">
+        View all past changes made to your financial records
+    </div>
+</body>
+</html>
+{% endblock %}

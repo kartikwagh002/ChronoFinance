@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Time Travel Query</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<div class="navbar">
+    <h2>ChronoFinance</h2>
+    <div class="nav-links">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/transactions">Transactions</a>
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+<body>
+    <div class="container">
+        <h2>Time Travel Query</h2>
+
+        <div class="form-box">
+            <form method="POST">
+                <label>Select Date:</label><br>
+                <input type="date" name="selected_date" value="{{ selected_date }}" required>
+                <br><br>
+                <button type="submit">Check Balance</button>
+            </form>
+        </div>
+
+        <br>
+
+        <div class="menu-links">
+            <a href="/dashboard">Back to Dashboard</a>
+        </div>
+
+        {% if balance_on_date is not none %}
+            <hr>
+            <div class="balance-card">
+                <h3>Balance on {{ selected_date }}</h3>
+                <p class="balance-amount">₹ {{ balance_on_date }}</p>
+            </div>
+
+            <h3>Transactions till {{ selected_date }}</h3>
+
+            {% if filtered_transactions %}
+                <table>
+                    <tr>
+                        <th>ID</th>
+                        <th>Type</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>Description</th>
+                        <th>Date</th>
+                    </tr>
+
+                    {% for t in filtered_transactions %}
+                    <tr>
+                        <td>{{ t.transaction_id }}</td>
+                        <td>{% if t.transaction_type == 'Income' %}
+                            <span class="badge badge-income">Income</span>
+                             {% else %}
+                            <span class="badge badge-expense">Expense</span>
+                             {% endif %}
+                        </td>
+                        <td>{{ t.category_name }}</td>
+                        <td>₹ {{ t.amount }}</td>
+                        <td>{{ t.description }}</td>
+                        <td>{{ t.transaction_date }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <p>No transactions found till this date.</p>
+            {% endif %}
+        {% endif %}
+    </div>
+</body>
+</html>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-section">
+    <h1 class="page-title">Welcome to ChronoFinance</h1>
+    <p class="page-subtitle">
+        A Personal Finance Tracker with Time Travel Query support.
+    </p>
+
+    <div class="action-row">
+        <a class="btn" href="/register">Register</a>
+        <a class="btn btn-secondary" href="/login">Login</a>
+        {% if session.get('user_id') %}
+            <a class="btn btn-dark" href="/dashboard">Go to Dashboard</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="empty-state">
+    Track income, expenses, history, monthly reports, and past balances — all in one place.
+</div>
+
+<div class="feature-grid">
+    <div class="feature-card">
+        <h3>Add Transactions</h3>
+        <p>Store your daily income and expenses in a clean and simple way.</p>
+    </div>
+
+    <div class="feature-card">
+        <h3>Time Travel Query</h3>
+        <p>Check your balance and past transactions for any selected date.</p>
+    </div>
+
+    <div class="feature-card">
+        <h3>Reports & History</h3>
+        <p>View monthly reports, category summaries, and full transaction history.</p>
+    </div>
+</div>
+{% endblock %}

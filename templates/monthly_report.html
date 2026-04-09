@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Monthly Report</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<div class="navbar">
+    <h2>ChronoFinance</h2>
+    <div class="nav-links">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/transactions">Transactions</a>
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+<body>
+    <div class="container">
+        <h2>Monthly Report</h2>
+
+        <div class="form-box">
+            <form method="POST">
+                <label>Select Month:</label><br>
+                <input type="month" name="selected_month" value="{{ selected_month }}" required>
+                <br><br>
+                <button type="submit">Show Report</button>
+            </form>
+        </div>
+
+        <br>
+
+        <div class="menu-links">
+            <a href="/dashboard">Back to Dashboard</a>
+        </div>
+
+        {% if selected_month %}
+            <hr>
+            <div class="balance-card">
+                <h3>Report for {{ selected_month }}</h3>
+                <p><strong>Total Income:</strong> ₹ {{ total_income }}</p>
+                <p><strong>Total Expense:</strong> ₹ {{ total_expense }}</p>
+                <p><strong>Savings:</strong> ₹ {{ savings }}</p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
+{% endblock %}

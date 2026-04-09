@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ChronoFinance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="navbar">
+    <div class="brand">ChronoFinance</div>
+
+    <div class="nav-links">
+        {% if session.get('user_id') %}
+            <a href="/dashboard">Dashboard</a>
+            <a href="/transactions">Transactions</a>
+            <a href="/logout">Logout</a>
+        {% else %}
+            <a href="/">Home</a>
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="page">
+    <div class="card">
+        {% block content %}
+        {% endblock %}
+    </div>
+</div>
+
+<div class="footer">
+    ChronoFinance © 2026
+</div>
+
+</body>
+</html>

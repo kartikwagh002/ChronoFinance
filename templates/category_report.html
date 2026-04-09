@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Category-wise Spending Report</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<div class="navbar">
+    <h2>ChronoFinance</h2>
+    <div class="nav-links">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/transactions">Transactions</a>
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+<body>
+    <div class="container">
+        <h2>Category-wise Spending Report</h2>
+
+        <div class="menu-links">
+            <a href="/dashboard">Back to Dashboard</a>
+        </div>
+
+        {% if category_data %}
+            <table>
+                <tr>
+                    <th>Category</th>
+                    <th>Total Spent</th>
+                </tr>
+
+                {% for item in category_data %}
+                <tr>
+                    <td>{{ item.category_name }}</td>
+                    <td>₹ {{ item.total_spent }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>No expense records found.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
+{% endblock %}
