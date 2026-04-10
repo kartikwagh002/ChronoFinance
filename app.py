@@ -19,12 +19,12 @@ def home():
 def test_db():
     try:
         conn = get_db_connection()
-        cursor = conn.cursor(buffered=True)
-        cursor.execute("SELECT DATABASE();")
-        result = cursor.fetchone()
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        tables = cursor.fetchall()
         cursor.close()
         conn.close()
-        return f"Connected successfully to database: {result[0]}"
+        return f"Connected successfully. Tables found: {len(tables)}"
     except Exception as e:
         return f"Database connection failed: {e}"
 
@@ -40,10 +40,10 @@ def register():
 
         try:
             conn = get_db_connection()
-            cursor = conn.cursor(buffered=True)
+            cursor = conn.cursor()
 
             cursor.execute(
-                "INSERT INTO users (username, email, password) VALUES (%s, %s, %s)",
+                "INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
                 (username, email, hashed_password)
             )
 
@@ -51,7 +51,7 @@ def register():
 
             cursor.execute("""
                 INSERT INTO user_financial_goals (user_id, monthly_budget, savings_goal)
-                VALUES (%s, %s, %s)
+                VALUES (?, ?, ?)
             """, (user_id, 10000, 50000))
 
             conn.commit()
@@ -74,9 +74,9 @@ def login():
 
         try:
             conn = get_db_connection()
-            cursor = conn.cursor(dictionary=True, buffered=True)
+            cursor = conn.cursor()
 
-            cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+            cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
             user = cursor.fetchone()
 
             cursor.close()
@@ -102,7 +102,7 @@ def dashboard():
 
     try:
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True, buffered=True)
+        cursor = conn.cursor()
 
         user_id = session["user_id"]
 
@@ -115,28 +115,28 @@ def dashboard():
                 END
             ), 0) AS balance
             FROM finance_transactions
-            WHERE user_id = %s
+            WHERE user_id = ?
         """, (user_id,))
         balance = cursor.fetchone()["balance"]
 
         cursor.execute("""
             SELECT COALESCE(SUM(amount), 0) AS total_income
             FROM finance_transactions
-            WHERE user_id = %s AND transaction_type = 'Income'
+            WHERE user_id = ? AND transaction_type = 'Income'
         """, (user_id,))
         total_income = cursor.fetchone()["total_income"]
 
         cursor.execute("""
             SELECT COALESCE(SUM(amount), 0) AS total_expense
             FROM finance_transactions
-            WHERE user_id = %s AND transaction_type = 'Expense'
+            WHERE user_id = ? AND transaction_type = 'Expense'
         """, (user_id,))
         total_expense = cursor.fetchone()["total_expense"]
 
         cursor.execute("""
             SELECT COUNT(*) AS total_transactions
             FROM finance_transactions
-            WHERE user_id = %s
+            WHERE user_id = ?
         """, (user_id,))
         total_transactions = cursor.fetchone()["total_transactions"]
 
@@ -146,7 +146,7 @@ def dashboard():
                 COALESCE(SUM(ft.amount), 0) AS total_spent
             FROM finance_transactions ft
             JOIN categories c ON ft.category_id = c.category_id
-            WHERE ft.user_id = %s
+            WHERE ft.user_id = ?
               AND ft.transaction_type = 'Expense'
             GROUP BY c.category_name
             ORDER BY total_spent DESC
@@ -160,18 +160,18 @@ def dashboard():
         cursor.execute("""
             SELECT COALESCE(SUM(amount), 0) AS month_income
             FROM finance_transactions
-            WHERE user_id = %s
+            WHERE user_id = ?
               AND transaction_type = 'Income'
-              AND DATE_FORMAT(transaction_date, '%%Y-%%m') = %s
+              AND substr(transaction_date, 1, 7) = ?
         """, (user_id, current_month))
         month_income = cursor.fetchone()["month_income"]
 
         cursor.execute("""
             SELECT COALESCE(SUM(amount), 0) AS month_expense
             FROM finance_transactions
-            WHERE user_id = %s
+            WHERE user_id = ?
               AND transaction_type = 'Expense'
-              AND DATE_FORMAT(transaction_date, '%%Y-%%m') = %s
+              AND substr(transaction_date, 1, 7) = ?
         """, (user_id, current_month))
         month_expense = cursor.fetchone()["month_expense"]
 
@@ -180,7 +180,7 @@ def dashboard():
         cursor.execute("""
             SELECT monthly_budget, savings_goal
             FROM user_financial_goals
-            WHERE user_id = %s
+            WHERE user_id = ?
         """, (user_id,))
         goals = cursor.fetchone()
 
@@ -213,7 +213,7 @@ def dashboard():
                 c.category_name
             FROM finance_transactions ft
             LEFT JOIN categories c ON ft.category_id = c.category_id
-            WHERE ft.user_id = %s
+            WHERE ft.user_id = ?
             ORDER BY ft.transaction_date DESC, ft.transaction_id DESC
             LIMIT 5
         """, (user_id,))
@@ -225,7 +225,7 @@ def dashboard():
                 COALESCE(SUM(ft.amount), 0) AS total_spent
             FROM finance_transactions ft
             JOIN categories c ON ft.category_id = c.category_id
-            WHERE ft.user_id = %s
+            WHERE ft.user_id = ?
               AND ft.transaction_type = 'Expense'
             GROUP BY c.category_name
             ORDER BY total_spent DESC
@@ -271,6 +271,70 @@ def dashboard():
         return f"Error: {e}"
 
 
+@app.route("/add-transaction", methods=["GET", "POST"])
+def add_transaction():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        if request.method == "POST":
+            category_id = request.form["category_id"]
+            amount = float(request.form["amount"])
+            transaction_type = request.form["transaction_type"]
+            description = request.form["description"]
+            transaction_date = request.form["transaction_date"]
+
+            cursor.execute("""
+                INSERT INTO finance_transactions
+                (user_id, category_id, transaction_type, amount, description, transaction_date)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, (
+                session["user_id"],
+                category_id,
+                transaction_type,
+                amount,
+                description,
+                transaction_date
+            ))
+
+            transaction_id = cursor.lastrowid
+
+            cursor.execute("""
+                INSERT INTO transaction_history
+                (transaction_id, user_id, category_id, transaction_type, amount, description, transaction_date, action_type)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                transaction_id,
+                session["user_id"],
+                category_id,
+                transaction_type,
+                amount,
+                description,
+                transaction_date,
+                "INSERT"
+            ))
+
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+            return redirect(url_for("transactions"))
+
+        cursor.execute("SELECT * FROM categories ORDER BY category_name ASC")
+        categories = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        return render_template("add_transaction.html", categories=categories)
+
+    except Exception as e:
+        return f"Error: {e}"
+
+
 @app.route("/transactions", methods=["GET"])
 def transactions():
     if "user_id" not in session:
@@ -278,7 +342,7 @@ def transactions():
 
     try:
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True, buffered=True)
+        cursor = conn.cursor()
 
         selected_type = request.args.get("type", "")
         selected_date = request.args.get("date", "")
@@ -294,20 +358,20 @@ def transactions():
                 c.category_name
             FROM finance_transactions ft
             JOIN categories c ON ft.category_id = c.category_id
-            WHERE ft.user_id = %s
+            WHERE ft.user_id = ?
         """
         values = [session["user_id"]]
 
         if selected_type:
-            sql += " AND ft.transaction_type = %s"
+            sql += " AND ft.transaction_type = ?"
             values.append(selected_type)
 
         if selected_date:
-            sql += " AND ft.transaction_date = %s"
+            sql += " AND ft.transaction_date = ?"
             values.append(selected_date)
 
         if search_query:
-            sql += " AND (ft.description LIKE %s OR c.category_name LIKE %s)"
+            sql += " AND (ft.description LIKE ? OR c.category_name LIKE ?)"
             like_value = f"%{search_query}%"
             values.append(like_value)
             values.append(like_value)
@@ -339,7 +403,7 @@ def edit_transaction(transaction_id):
 
     try:
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True, buffered=True)
+        cursor = conn.cursor()
 
         cursor.execute("SELECT * FROM categories ORDER BY category_name ASC")
         categories = cursor.fetchall()
@@ -347,7 +411,7 @@ def edit_transaction(transaction_id):
         cursor.execute("""
             SELECT *
             FROM finance_transactions
-            WHERE transaction_id = %s AND user_id = %s
+            WHERE transaction_id = ? AND user_id = ?
         """, (transaction_id, session["user_id"]))
         transaction = cursor.fetchone()
 
@@ -358,19 +422,19 @@ def edit_transaction(transaction_id):
 
         if request.method == "POST":
             category_id = request.form["category_id"]
-            amount = request.form["amount"]
+            amount = float(request.form["amount"])
             transaction_type = request.form["transaction_type"]
             description = request.form["description"]
             transaction_date = request.form["transaction_date"]
 
             cursor.execute("""
                 UPDATE finance_transactions
-                SET category_id = %s,
-                    amount = %s,
-                    transaction_type = %s,
-                    description = %s,
-                    transaction_date = %s
-                WHERE transaction_id = %s AND user_id = %s
+                SET category_id = ?,
+                    amount = ?,
+                    transaction_type = ?,
+                    description = ?,
+                    transaction_date = ?
+                WHERE transaction_id = ? AND user_id = ?
             """, (
                 category_id,
                 amount,
@@ -380,8 +444,23 @@ def edit_transaction(transaction_id):
                 transaction_id,
                 session["user_id"]
             ))
-            conn.commit()
 
+            cursor.execute("""
+                INSERT INTO transaction_history
+                (transaction_id, user_id, category_id, transaction_type, amount, description, transaction_date, action_type)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                transaction_id,
+                session["user_id"],
+                category_id,
+                transaction_type,
+                amount,
+                description,
+                transaction_date,
+                "UPDATE"
+            ))
+
+            conn.commit()
             cursor.close()
             conn.close()
 
@@ -407,13 +486,37 @@ def delete_transaction(transaction_id):
 
     try:
         conn = get_db_connection()
-        cursor = conn.cursor(buffered=True)
+        cursor = conn.cursor()
 
         cursor.execute("""
-            DELETE FROM finance_transactions
-            WHERE transaction_id = %s AND user_id = %s
+            SELECT *
+            FROM finance_transactions
+            WHERE transaction_id = ? AND user_id = ?
         """, (transaction_id, session["user_id"]))
-        conn.commit()
+        transaction = cursor.fetchone()
+
+        if transaction:
+            cursor.execute("""
+                INSERT INTO transaction_history
+                (transaction_id, user_id, category_id, transaction_type, amount, description, transaction_date, action_type)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                transaction["transaction_id"],
+                transaction["user_id"],
+                transaction["category_id"],
+                transaction["transaction_type"],
+                transaction["amount"],
+                transaction["description"],
+                transaction["transaction_date"],
+                "DELETE"
+            ))
+
+            cursor.execute("""
+                DELETE FROM finance_transactions
+                WHERE transaction_id = ? AND user_id = ?
+            """, (transaction_id, session["user_id"]))
+
+            conn.commit()
 
         cursor.close()
         conn.close()
@@ -438,7 +541,7 @@ def time_travel():
             selected_date = request.form["selected_date"]
 
             conn = get_db_connection()
-            cursor = conn.cursor(dictionary=True, buffered=True)
+            cursor = conn.cursor()
 
             cursor.execute("""
                 SELECT
@@ -450,7 +553,7 @@ def time_travel():
                         END
                     ), 0) AS balance_on_date
                 FROM finance_transactions
-                WHERE user_id = %s AND transaction_date <= %s
+                WHERE user_id = ? AND transaction_date <= ?
             """, (session["user_id"], selected_date))
             balance_on_date = cursor.fetchone()["balance_on_date"]
 
@@ -464,7 +567,7 @@ def time_travel():
                     c.category_name
                 FROM finance_transactions ft
                 JOIN categories c ON ft.category_id = c.category_id
-                WHERE ft.user_id = %s AND ft.transaction_date <= %s
+                WHERE ft.user_id = ? AND ft.transaction_date <= ?
                 ORDER BY ft.transaction_date DESC, ft.transaction_id DESC
             """, (session["user_id"], selected_date))
             filtered_transactions = cursor.fetchall()
@@ -490,7 +593,7 @@ def history():
 
     try:
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True, buffered=True)
+        cursor = conn.cursor()
 
         cursor.execute("""
             SELECT
@@ -505,7 +608,7 @@ def history():
                 c.category_name
             FROM transaction_history th
             LEFT JOIN categories c ON th.category_id = c.category_id
-            WHERE th.user_id = %s
+            WHERE th.user_id = ?
             ORDER BY th.changed_at DESC, th.history_id DESC
         """, (session["user_id"],))
         history_records = cursor.fetchall()
@@ -539,23 +642,23 @@ def monthly_report():
             end_date = f"{year}-{month:02d}-{last_day:02d}"
 
             conn = get_db_connection()
-            cursor = conn.cursor(dictionary=True, buffered=True)
+            cursor = conn.cursor()
 
             cursor.execute("""
                 SELECT COALESCE(SUM(amount), 0) AS total_income
                 FROM finance_transactions
-                WHERE user_id = %s
+                WHERE user_id = ?
                   AND transaction_type = 'Income'
-                  AND transaction_date BETWEEN %s AND %s
+                  AND transaction_date BETWEEN ? AND ?
             """, (session["user_id"], start_date, end_date))
             total_income = cursor.fetchone()["total_income"]
 
             cursor.execute("""
                 SELECT COALESCE(SUM(amount), 0) AS total_expense
                 FROM finance_transactions
-                WHERE user_id = %s
+                WHERE user_id = ?
                   AND transaction_type = 'Expense'
-                  AND transaction_date BETWEEN %s AND %s
+                  AND transaction_date BETWEEN ? AND ?
             """, (session["user_id"], start_date, end_date))
             total_expense = cursor.fetchone()["total_expense"]
 
@@ -583,7 +686,7 @@ def category_report():
 
     try:
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True, buffered=True)
+        cursor = conn.cursor()
 
         cursor.execute("""
             SELECT
@@ -591,7 +694,7 @@ def category_report():
                 COALESCE(SUM(ft.amount), 0) AS total_spent
             FROM finance_transactions ft
             JOIN categories c ON ft.category_id = c.category_id
-            WHERE ft.user_id = %s
+            WHERE ft.user_id = ?
               AND ft.transaction_type = 'Expense'
             GROUP BY c.category_name
             ORDER BY total_spent DESC
@@ -614,7 +717,7 @@ def settings():
 
     try:
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True, buffered=True)
+        cursor = conn.cursor()
 
         user_id = session["user_id"]
 
@@ -627,8 +730,8 @@ def settings():
 
             cursor.execute("""
                 UPDATE user_financial_goals
-                SET monthly_budget = %s, savings_goal = %s
-                WHERE user_id = %s
+                SET monthly_budget = ?, savings_goal = ?
+                WHERE user_id = ?
             """, (monthly_budget, savings_goal, user_id))
 
             conn.commit()
@@ -640,7 +743,7 @@ def settings():
         cursor.execute("""
             SELECT monthly_budget, savings_goal
             FROM user_financial_goals
-            WHERE user_id = %s
+            WHERE user_id = ?
         """, (user_id,))
         goals = cursor.fetchone()
 
@@ -665,23 +768,23 @@ def monthly_report_pdf(selected_month):
         end_date = f"{year}-{month:02d}-{last_day:02d}"
 
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True, buffered=True)
+        cursor = conn.cursor()
 
         cursor.execute("""
             SELECT COALESCE(SUM(amount), 0) AS total_income
             FROM finance_transactions
-            WHERE user_id = %s
+            WHERE user_id = ?
               AND transaction_type = 'Income'
-              AND transaction_date BETWEEN %s AND %s
+              AND transaction_date BETWEEN ? AND ?
         """, (session["user_id"], start_date, end_date))
         total_income = cursor.fetchone()["total_income"]
 
         cursor.execute("""
             SELECT COALESCE(SUM(amount), 0) AS total_expense
             FROM finance_transactions
-            WHERE user_id = %s
+            WHERE user_id = ?
               AND transaction_type = 'Expense'
-              AND transaction_date BETWEEN %s AND %s
+              AND transaction_date BETWEEN ? AND ?
         """, (session["user_id"], start_date, end_date))
         total_expense = cursor.fetchone()["total_expense"]
 
