@@ -5,9 +5,17 @@ from datetime import date
 import calendar
 from io import BytesIO
 from fpdf import FPDF
+import os
+from init_db import init_db
 
 app = Flask(__name__)
 app.secret_key = "chronofinance_secret_key"
+
+try:
+    if os.environ.get("RENDER"):
+        init_db()
+except Exception as e:
+    print(f"Database initialization error: {e}")
 
 
 @app.route("/")
@@ -845,10 +853,5 @@ def logout():
     return redirect(url_for("login"))
 
 
-from init_db import init_db
-
-init_db()
-
 if __name__ == "__main__":
     app.run(debug=True)
-    
