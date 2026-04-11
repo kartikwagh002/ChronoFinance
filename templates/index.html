@@ -1,39 +1,68 @@
 {% extends "base.html" %}
 
+{% block title %}ChronoFinance{% endblock %}
+
 {% block content %}
-<div class="hero-section">
-    <h1 class="page-title">Welcome to ChronoFinance</h1>
-    <p class="page-subtitle">
-        A Personal Finance Tracker with Time Travel Query support.
-    </p>
+<section class="hero-section cred-hero">
+    <div class="hero-copy">
+        <p class="eyebrow">all your money. one elegant place.</p>
+        <h1 class="hero-title">track money<br>the premium way.</h1>
+        <p class="hero-subtitle">
+            ChronoFinance helps you manage income, expenses, reports, and time travel queries
+            with a clean luxury dashboard experience.
+        </p>
 
-    <div class="action-row">
-        <a class="btn" href="/register">Register</a>
-        <a class="btn btn-secondary" href="/login">Login</a>
-        {% if session.get('user_id') %}
-            <a class="btn btn-dark" href="/dashboard">Go to Dashboard</a>
-        {% endif %}
-    </div>
-</div>
-
-<div class="empty-state">
-    Track income, expenses, history, monthly reports, and past balances — all in one place.
-</div>
-
-<div class="feature-grid">
-    <div class="feature-card">
-        <h3>Add Transactions</h3>
-        <p>Store your daily income and expenses in a clean and simple way.</p>
+        <div class="action-row hero-actions">
+            <a href="/register" class="btn btn-light">Get Started</a>
+            <a href="/login" class="btn btn-ghost">Login</a>
+        </div>
     </div>
 
-    <div class="feature-card">
-        <h3>Time Travel Query</h3>
-        <p>Check your balance and past transactions for any selected date.</p>
+    <div class="hero-visual">
+        <div class="phone-mock">
+            <div class="mock-top"></div>
+            <div class="mock-card glow-card">
+                <span class="mock-label">Current Balance</span>
+                <h3>₹ 48,560</h3>
+                <p>updated live with your transactions</p>
+            </div>
+            <div class="mock-grid">
+                <div class="mini-dark-card">
+                    <span>Income</span>
+                    <strong>₹ 72,000</strong>
+                </div>
+                <div class="mini-dark-card">
+                    <span>Expense</span>
+                    <strong>₹ 23,440</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="feature-grid premium-feature-grid">
+    <div class="feature-card dark-feature-card">
+        <span class="feature-number">01</span>
+        <h3>Track everything</h3>
+        <p>View income, expense, savings, balance, and monthly performance in one place.</p>
     </div>
 
-    <div class="feature-card">
-        <h3>Reports & History</h3>
-        <p>View monthly reports, category summaries, and full transaction history.</p>
+    <div class="feature-card dark-feature-card">
+        <span class="feature-number">02</span>
+        <h3>Time travel query</h3>
+        <p>Go back to any date and understand where your money stood at that moment.</p>
     </div>
-</div>
+
+    <div class="feature-card dark-feature-card">
+        <span class="feature-number">03</span>
+        <h3>Elegant reports</h3>
+        <p>Generate clean monthly summaries and category-based insights quickly.</p>
+    </div>
+
+    <div class="feature-card dark-feature-card">
+        <span class="feature-number">04</span>
+        <h3>Premium dashboard</h3>
+        <p>Minimal dark visuals, smart insights, and a focused finance experience.</p>
+    </div>
+</section>
 {% endblock %}

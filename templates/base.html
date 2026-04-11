@@ -1,39 +1,71 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>ChronoFinance</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ChronoFinance{% endblock %}</title>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
 
-<div class="navbar">
-    <div class="brand">ChronoFinance</div>
+    <header class="site-header">
+        <nav class="navbar">
+            <div class="nav-left">
+                <a href="/" class="brand">
+                    <i class="fa-solid fa-wallet brand-icon"></i>
+                    <span>ChronoFinance</span>
+                </a>
+            </div>
 
-    <div class="nav-links">
-        {% if session.get('user_id') %}
-            <a href="/dashboard">Dashboard</a>
-            <a href="/add-transaction">Add Transaction</a>
-            <a href="/transactions">Transactions</a>
-            <a href="/logout">Logout</a>
-        {% else %}
-            <a href="/">Home</a>
-            <a href="/login">Login</a>
-            <a href="/register">Register</a>
-        {% endif %}
-    </div>
-</div>
+            <div class="nav-right">
+                {% if session.get('user_id') %}
+                    <a href="/dashboard" class="nav-link">Dashboard</a>
+                    <a href="{{ url_for('add_transaction') }}" class="nav-link">Add Transaction</a>
+                    <a href="/transactions" class="nav-link">Transactions</a>
+                    <a href="/history" class="nav-link">History</a>
+                    <a href="/monthly-report" class="nav-link">Reports</a>
+                    <a href="/settings" class="nav-link">Settings</a>
+                    <a href="/logout" class="nav-link nav-link-danger">Logout</a>
+                {% else %}
+                    <a href="/" class="nav-link">Home</a>
+                    <a href="/login" class="nav-link">Login</a>
+                    <a href="/register" class="nav-link nav-link-primary">Register</a>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
 
-<div class="page">
-    <div class="card">
-        {% block content %}
-        {% endblock %}
-    </div>
-</div>
+    <main class="main-wrapper">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-wrapper">
+                    {% for category, message in messages %}
+                        <div class="flash-message flash-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
 
-<footer style="text-align:center; margin-top:30px; padding:15px; border-top:1px solid #ddd;">
-    <p style="font-weight:bold; margin:0;">ChronoFinance © 2026</p>
-    <p style="font-size:13px; color:#777; margin:5px 0 0;">Built by Kartik & Awanti</p>
-</footer>
+        {% block page_header %}{% endblock %}
+
+        <section class="content-shell {% block content_class %}content-card{% endblock %}">
+            {% block content %}{% endblock %}
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <p class="footer-brand">ChronoFinance</p>
+            <p class="footer-text">Built by Awanti and Kartik</p>
+        </div>
+    </footer>
 
 </body>
 </html>

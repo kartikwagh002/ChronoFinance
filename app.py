@@ -368,10 +368,10 @@ def dashboard():
 def add_transaction():
     try:
         if request.method == "POST":
-            category_id = request.form["category_id"]
+            category_id = int(request.form["category_id"])
             amount = float(request.form["amount"])
             transaction_type = request.form["transaction_type"]
-            description = request.form["description"]
+            description = request.form["description"].strip()
             transaction_date = request.form["transaction_date"]
 
             def write(conn):
