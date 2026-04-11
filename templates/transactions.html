@@ -1,99 +1,115 @@
 {% extends "base.html" %}
 
+{% block title %}Transactions | ChronoFinance{% endblock %}
+
 {% block content %}
-<div class="section-header-row">
-    <div>
-        <h1 class="page-title">All Transactions</h1>
-        <p class="page-subtitle">Search, filter, edit, and manage your financial records.</p>
+<div class="transactions-shell">
+    <div class="transactions-toolbar">
+        <div class="transactions-toolbar-left">
+            <h1>All Transactions</h1>
+            <p>Search, filter, edit, and manage your financial records.</p>
+        </div>
+        <div class="transactions-toolbar-right">
+            {{ transactions|length }} record(s) found
+        </div>
     </div>
-    <div class="table-side-note">
-        {{ transactions|length }} record(s) found
+
+    <div class="transactions-filter-card">
+        <form method="GET" action="{{ url_for('transactions') }}" class="filter-form">
+            <input
+                type="text"
+                name="search"
+                placeholder="Search by description or category"
+                value="{{ search_query }}"
+            >
+
+            <select name="type">
+                <option value="">All Types</option>
+                <option value="Income" {% if selected_type == 'Income' %}selected{% endif %}>Income</option>
+                <option value="Expense" {% if selected_type == 'Expense' %}selected{% endif %}>Expense</option>
+            </select>
+
+            <input type="date" name="date" value="{{ selected_date }}">
+
+            <button type="submit" class="btn btn-light">Search</button>
+            <a href="{{ url_for('transactions') }}" class="btn btn-ghost">Clear</a>
+        </form>
+
+        <div class="transactions-actions">
+            <a class="btn btn-light" href="{{ url_for('add_transaction') }}">Add Transaction</a>
+            <a class="btn btn-ghost" href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+        </div>
     </div>
-</div>
 
-<div class="quick-actions-panel">
-    <form method="GET" class="filter-form">
-        <input type="text" name="search" placeholder="Search by description or category" value="{{ search_query }}">
+    <div class="transactions-divider"></div>
 
-        <select name="type">
-            <option value="">All Types</option>
-            <option value="Income" {% if selected_type == 'Income' %}selected{% endif %}>Income</option>
-            <option value="Expense" {% if selected_type == 'Expense' %}selected{% endif %}>Expense</option>
-        </select>
+    {% if transactions %}
+    <div class="table-wrap dark-table-wrap">
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Description</th>
+                <th>Date</th>
+                <th>Action</th>
+            </tr>
 
-        <input type="date" name="date" value="{{ selected_date }}">
-
-        <button type="submit">Search</button>
-        <a href="/transactions" class="btn btn-secondary">Clear</a>
-    </form>
-
-    <div class="action-row section-space">
-        <a class="btn" href="/add-transaction">Add Transaction</a>
-        <a class="btn btn-secondary" href="/dashboard">Back to Dashboard</a>
+            {% for t in transactions %}
+            <tr>
+                <td>{{ t.transaction_id }}</td>
+                <td>
+                    {% if t.transaction_type == 'Income' %}
+                        <span class="badge badge-income">Income</span>
+                    {% else %}
+                        <span class="badge badge-expense">Expense</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if t.category_name %}
+                        <span class="category-pill">{{ t.category_name }}</span>
+                    {% else %}
+                        <span class="small-muted">No category</span>
+                    {% endif %}
+                </td>
+                <td class="{% if t.transaction_type == 'Income' %}amount-income{% else %}amount-expense{% endif %}">
+                    {% if t.transaction_type == 'Income' %}
+                        + ₹ {{ t.amount }}
+                    {% else %}
+                        - ₹ {{ t.amount }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if t.description %}
+                        {{ t.description }}
+                    {% else %}
+                        <span class="small-muted">No description</span>
+                    {% endif %}
+                </td>
+                <td>{{ t.transaction_date }}</td>
+                <td>
+                    <div class="table-action-group">
+                        <a href="{{ url_for('edit_transaction', transaction_id=t.transaction_id) }}" class="btn btn-light btn-sm">
+                            Edit
+                        </a>
+                        <a
+                            href="{{ url_for('delete_transaction', transaction_id=t.transaction_id) }}"
+                            class="btn btn-ghost btn-sm"
+                            onclick="return confirm('Are you sure you want to delete this transaction?')"
+                        >
+                            Delete
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
     </div>
+    {% else %}
+    <div class="primary-table-empty">
+        No transactions found. Try changing filters or add a new transaction.
+    </div>
+    {% endif %}
 </div>
-
-<hr>
-
-{% if transactions %}
-<div class="table-wrap premium-table-wrap">
-    <table>
-        <tr>
-            <th>ID</th>
-            <th>Type</th>
-            <th>Category</th>
-            <th>Amount</th>
-            <th>Description</th>
-            <th>Date</th>
-            <th>Action</th>
-        </tr>
-
-        {% for t in transactions %}
-        <tr>
-            <td>{{ t.transaction_id }}</td>
-            <td>
-                {% if t.transaction_type == 'Income' %}
-                    <span class="badge badge-income">Income</span>
-                {% else %}
-                    <span class="badge badge-expense">Expense</span>
-                {% endif %}
-            </td>
-            <td>
-                {% if t.category_name %}
-                    <span class="category-pill">{{ t.category_name }}</span>
-                {% else %}
-                    <span class="small-muted">No category</span>
-                {% endif %}
-            </td>
-            <td class="{% if t.transaction_type == 'Income' %}amount-income{% else %}amount-expense{% endif %}">
-                {% if t.transaction_type == 'Income' %}
-                    + ₹ {{ t.amount }}
-                {% else %}
-                    - ₹ {{ t.amount }}
-                {% endif %}
-            </td>
-            <td>
-                {% if t.description %}
-                    {{ t.description }}
-                {% else %}
-                    <span class="small-muted">No description</span>
-                {% endif %}
-            </td>
-            <td>{{ t.transaction_date }}</td>
-            <td>
-                <div class="table-action-group">
-                    <a href="/edit-transaction/{{ t.transaction_id }}" class="btn btn-sm">Edit</a>
-                    <a href="/delete-transaction/{{ t.transaction_id }}" class="btn btn-secondary btn-sm"
-                       onclick="return confirm('Are you sure you want to delete this transaction?')">Delete</a>
-                </div>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-</div>
-{% else %}
-<div class="empty-state">
-    No transactions found. Try changing filters or add a new transaction.
-</div>
-{% endif %}
 {% endblock %}
