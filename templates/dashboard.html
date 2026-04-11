@@ -256,13 +256,14 @@
     const overviewLabels = {{ overview_labels | tojson }};
     const overviewValues = {{ overview_values | tojson }};
 
-    const chartDefaults = {
-        color: "#a1a1aa",
-        borderColor: "rgba(255,255,255,0.08)"
-    };
-
-    Chart.defaults.color = chartDefaults.color;
-    Chart.defaults.borderColor = chartDefaults.borderColor;
+    function generateColors(count) {
+        let colors = [];
+        for (let i = 0; i < count; i++) {
+            let hue = Math.floor((360 / count) * i);
+            colors.push(`hsl(${hue}, 70%, 60%)`);
+        }
+        return colors;
+    }
 
     const categoryCanvas = document.getElementById("categoryChart");
     if (categoryCanvas) {
@@ -271,7 +272,8 @@
             data: {
                 labels: categoryLabels,
                 datasets: [{
-                    data: categoryValues,
+                    data: categoryValues.map(Number),
+                    backgroundColor: generateColors(categoryLabels.length), // ✅ FIX
                     borderWidth: 0
                 }]
             },
@@ -298,7 +300,7 @@
                 labels: overviewLabels,
                 datasets: [{
                     label: "Amount",
-                    data: overviewValues,
+                    data: overviewValues.map(Number), // ✅ FIX
                     borderRadius: 12,
                     borderWidth: 0
                 }]
