@@ -7,7 +7,9 @@ It allows users to manage income, expenses, and financial goals with advanced fe
 
 ## 🚀 Live Demo
 
+🌐(https://chronofinance.onrender.com)
 🌐(https://chronofinance-1.onrender.com)
+
 *(Note: This is a demo deployment. Data may reset due to free hosting limitations.)*
 
 ---
