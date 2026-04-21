@@ -1,4 +1,4 @@
-# 💰 ChronoFinance
+<img width="1546" height="640" alt="image" src="https://github.com/user-attachments/assets/215b3c6d-a26c-4483-b8e3-7eef6d4d617c" /># 💰 ChronoFinance
 
 ChronoFinance is a **DBMS-based financial tracking web application** built using Flask and SQLite.
 It allows users to manage income, expenses, and financial goals with advanced features like **transaction history tracking, time travel queries, and PDF report generation**.
