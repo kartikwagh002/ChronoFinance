@@ -64,7 +64,8 @@ It allows users to manage income, expenses, and financial goals with advanced fe
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/ChronoFinance.git
+git clone https://github.com/kartikwagh002/ChronoFinance.git
+git clone https://github.com/adorebyawanti/ChronoFinance.git
 cd ChronoFinance
 ```
 
@@ -89,14 +90,24 @@ python app.py
 5. Open in browser:
 
 ```
-http://127.0.0.1:5000
+(https://chronofinance-1.onrender.com)
 ```
 
 ---
 
 ## 📷 Screenshots
 
-*(Add screenshots of dashboard, reports, etc. here)*
+Opening Interface  -  ![alt text](image-1.png)
+Account Creation   -  ![alt text](image-2.png)
+Login Page         -  ![alt text](image-3.png)
+Dashboard          -  ![alt text](image-4.png)
+                      ![alt text](image-5.png)
+                      ![alt text](image-6.png)
+Add Transaction    -  ![alt text](image-7.png)
+All Transactions   -  ![alt text](image-8.png)
+History Page       -  ![alt text](image-9.png)
+Monthly Report     -  ![alt text](image-10.png)
+Financial Settings -  ![alt text](image-11.png)
 
 ---
 
