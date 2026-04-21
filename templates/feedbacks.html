@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Feedback Messages | ChronoFinance{% endblock %}
+
+{% block content %}
+<div class="section-header-row">
+    <div>
+        <p class="eyebrow">USER FEEDBACK</p>
+        <h2 class="section-title">Submitted Feedback Messages</h2>
+    </div>
+    <p class="table-side-note">All contact form messages are shown below.</p>
+</div>
+
+{% if feedbacks %}
+<div class="table-wrap dark-table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Subject</th>
+                <th>Message</th>
+                <th>Created At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for feedback in feedbacks %}
+            <tr>
+                <td>{{ feedback.feedback_id }}</td>
+                <td>{{ feedback.name }}</td>
+                <td>{{ feedback.email }}</td>
+                <td>{{ feedback.subject or 'No Subject' }}</td>
+                <td>{{ feedback.message }}</td>
+                <td>{{ feedback.created_at }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    No feedback messages found yet.
+</div>
+{% endif %}
+{% endblock %}

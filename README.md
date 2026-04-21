@@ -7,8 +7,9 @@ It allows users to manage income, expenses, and financial goals with advanced fe
 
 ## 🚀 Live Demo
 
-🌐 https://chronofinance.onrender.com/
+🌐 https://chronofinance.onrender.com/  
 🌐 https://chronofinance-1.onrender.com/
+
 *(Note: This is a demo deployment. Data may reset due to free hosting limitations.)*
 
 ---
@@ -64,7 +65,6 @@ It allows users to manage income, expenses, and financial goals with advanced fe
 
 ```bash
 git clone https://github.com/kartikwagh002/ChronoFinance.git
-git clone https://github.com/adorebyawanti/chronoFinance.git
 cd ChronoFinance
 ```
 
@@ -89,7 +89,7 @@ python app.py
 5. Open in browser:
 
 ```
-https://chronofinance-1.onrender.com/
+
 ```
 
 ---
@@ -108,8 +108,6 @@ History Page       -  ![alt text](image-9.png)
 Monthly Report     -  ![alt text](image-10.png)
 Financial Settings -  ![alt text](image-11.png)
 
-
----
 
 ## ⚠️ Important Note
 

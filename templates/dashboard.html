@@ -1,20 +1,23 @@
 {% extends "base.html" %}
 
 {% block title %}Dashboard - ChronoFinance{% endblock %}
+{% block content_class %}dashboard-shell{% endblock %}
 
 {% block content %}
 <section class="dashboard-top">
     <div>
-        <p class="eyebrow">overview</p>
+        <p class="eyebrow">premium overview</p>
         <h1 class="hero-title dashboard-title">money, refined.</h1>
-        <p class="hero-subtitle">Welcome back, {{ username }}. Here is your premium financial overview.</p>
+        <p class="hero-subtitle">
+            Welcome back, {{ username }}. Here is your premium financial overview.
+        </p>
     </div>
 
     <div class="hero-badge">
         {% if balance >= 0 %}
-            Stable Balance
+            <i class="fa-solid fa-circle-check"></i> Stable Balance
         {% else %}
-            Negative Balance
+            <i class="fa-solid fa-triangle-exclamation"></i> Negative Balance
         {% endif %}
     </div>
 </section>
@@ -22,72 +25,93 @@
 <div class="insight-banner dark-banner">
     {% if top_category %}
         <strong>Insight:</strong>
-        most spending happened in <strong>{{ top_category.category_name }}</strong> with <strong>₹ {{ top_category.total_spent }}</strong>.
+        Most spending happened in <strong>{{ top_category.category_name }}</strong> with
+        <strong>₹ {{ top_category.total_spent }}</strong>.
     {% else %}
         <strong>Insight:</strong>
-        add expense transactions to unlock category intelligence.
+        Add expense transactions to unlock category intelligence.
     {% endif %}
 </div>
 
 <div class="summary-grid premium-summary-grid">
     <div class="summary-card luxury-card income-gradient">
-        <span class="card-icon"><i class="fa-solid fa-arrow-trend-up"></i></span>
+        <div class="card-top-row">
+            <span class="card-icon"><i class="fa-solid fa-arrow-trend-up"></i></span>
+            <span class="card-chip chip-green">Income</span>
+        </div>
         <h3>Total Income</h3>
         <p>₹ {{ total_income }}</p>
-        <small>money added</small>
+        <small>Money added to your account</small>
     </div>
 
     <div class="summary-card luxury-card expense-gradient">
-        <span class="card-icon"><i class="fa-solid fa-arrow-trend-down"></i></span>
+        <div class="card-top-row">
+            <span class="card-icon"><i class="fa-solid fa-arrow-trend-down"></i></span>
+            <span class="card-chip chip-red">Expense</span>
+        </div>
         <h3>Total Expense</h3>
         <p>₹ {{ total_expense }}</p>
-        <small>money spent</small>
+        <small>Money spent so far</small>
     </div>
 
     <div class="summary-card luxury-card balance-gradient">
-        <span class="card-icon"><i class="fa-solid fa-wallet"></i></span>
+        <div class="card-top-row">
+            <span class="card-icon"><i class="fa-solid fa-wallet"></i></span>
+            <span class="card-chip chip-blue">Balance</span>
+        </div>
         <h3>Current Balance</h3>
         <p>₹ {{ balance }}</p>
-        <small>{% if balance >= 0 %}healthy position{% else %}watch your spending{% endif %}</small>
+        <small>{% if balance >= 0 %}Healthy position{% else %}Watch your spending{% endif %}</small>
     </div>
 
     <div class="summary-card luxury-card transactions-gradient">
-        <span class="card-icon"><i class="fa-solid fa-layer-group"></i></span>
+        <div class="card-top-row">
+            <span class="card-icon"><i class="fa-solid fa-layer-group"></i></span>
+            <span class="card-chip chip-neutral">Activity</span>
+        </div>
         <h3>Total Transactions</h3>
         <p>{{ total_transactions }}</p>
-        <small>all activity</small>
+        <small>All recorded activity</small>
     </div>
 </div>
 
-<div class="summary-grid premium-summary-grid">
+<div class="summary-grid premium-summary-grid monthly-grid">
     <div class="summary-card luxury-card neutral-card">
-        <span class="card-icon"><i class="fa-solid fa-calendar-plus"></i></span>
+        <div class="card-top-row">
+            <span class="card-icon"><i class="fa-solid fa-calendar-plus"></i></span>
+        </div>
         <h3>This Month Income</h3>
         <p>₹ {{ month_income }}</p>
-        <small>current month earnings</small>
+        <small>Current month earnings</small>
     </div>
 
     <div class="summary-card luxury-card neutral-card">
-        <span class="card-icon"><i class="fa-solid fa-calendar-minus"></i></span>
+        <div class="card-top-row">
+            <span class="card-icon"><i class="fa-solid fa-calendar-minus"></i></span>
+        </div>
         <h3>This Month Expense</h3>
         <p>₹ {{ month_expense }}</p>
-        <small>current month spending</small>
+        <small>Current month spending</small>
     </div>
 
     <div class="summary-card luxury-card neutral-card">
-        <span class="card-icon"><i class="fa-solid fa-piggy-bank"></i></span>
+        <div class="card-top-row">
+            <span class="card-icon"><i class="fa-solid fa-piggy-bank"></i></span>
+        </div>
         <h3>This Month Savings</h3>
         <p>₹ {{ month_savings }}</p>
-        <small>income minus expense</small>
+        <small>Income minus expense</small>
     </div>
 </div>
 
 {% if budget_status == "over" %}
 <div class="budget-warning">
+    <i class="fa-solid fa-triangle-exclamation"></i>
     Budget alert: you exceeded your monthly budget of ₹ {{ budget_limit }}.
 </div>
 {% else %}
 <div class="budget-good">
+    <i class="fa-solid fa-circle-check"></i>
     You are within your monthly budget of ₹ {{ budget_limit }}.
 </div>
 {% endif %}
@@ -162,18 +186,27 @@
 
 <div class="chart-grid">
     <div class="chart-card dark-panel">
-        <h3>Expense by Category</h3>
+        <div class="panel-head">
+            <h3>Expense by Category</h3>
+            <span class="panel-note">Spending split</span>
+        </div>
         <canvas id="categoryChart"></canvas>
     </div>
 
     <div class="chart-card dark-panel">
-        <h3>This Month Overview</h3>
+        <div class="panel-head">
+            <h3>This Month Overview</h3>
+            <span class="panel-note">Income vs Expense vs Savings</span>
+        </div>
         <canvas id="overviewChart"></canvas>
     </div>
 </div>
 
 <div class="quick-actions-panel dark-panel">
-    <h2 class="section-title">Quick Actions</h2>
+    <div class="panel-head">
+        <h2 class="section-title">Quick Actions</h2>
+        <span class="panel-note">Jump faster</span>
+    </div>
     <div class="action-row">
         <a class="btn btn-light" href="/add-transaction">Add Transaction</a>
         <a class="btn btn-ghost" href="/transactions">Transactions</a>
@@ -188,10 +221,10 @@
 <div class="section-header-row">
     <div>
         <h2>Recent Transactions</h2>
-        <p class="page-subtitle">your latest 5 records</p>
+        <p class="page-subtitle">Your latest 5 records</p>
     </div>
     <div class="table-side-note">
-        latest activity
+        Latest activity
     </div>
 </div>
 
@@ -208,7 +241,7 @@
         </tr>
         {% for t in recent_transactions %}
         <tr>
-            <td>{{ t.transaction_id }}</td>
+            <td>#{{ t.transaction_id }}</td>
             <td>
                 {% if t.category_name %}
                     <span class="category-pill">{{ t.category_name }}</span>
@@ -273,18 +306,23 @@
                 labels: categoryLabels,
                 datasets: [{
                     data: categoryValues.map(Number),
-                    backgroundColor: generateColors(categoryLabels.length), // ✅ FIX
-                    borderWidth: 0
+                    backgroundColor: generateColors(categoryLabels.length),
+                    borderWidth: 0,
+                    hoverOffset: 8
                 }]
             },
             options: {
                 responsive: true,
-                cutout: "68%",
+                maintainAspectRatio: false,
+                cutout: "72%",
                 plugins: {
                     legend: {
                         position: "bottom",
                         labels: {
-                            color: "#d4d4d8"
+                            color: "#d4d4d8",
+                            padding: 18,
+                            usePointStyle: true,
+                            pointStyle: "circle"
                         }
                     }
                 }
@@ -300,13 +338,15 @@
                 labels: overviewLabels,
                 datasets: [{
                     label: "Amount",
-                    data: overviewValues.map(Number), // ✅ FIX
-                    borderRadius: 12,
+                    data: overviewValues.map(Number),
+                    borderRadius: 14,
+                    borderSkipped: false,
                     borderWidth: 0
                 }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
                     legend: {
                         labels: {

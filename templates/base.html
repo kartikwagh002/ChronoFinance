@@ -8,15 +8,16 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
-<body>
+<body class="{% block body_class %}{% endblock %}">
 
     <header class="site-header">
         <nav class="navbar">
             <div class="nav-left">
                 <a href="/" class="brand">
+                    <span class="brand-orb"></span>
                     <i class="fa-solid fa-wallet brand-icon"></i>
                     <span>ChronoFinance</span>
                 </a>
@@ -33,6 +34,9 @@
                     <a href="/logout" class="nav-link nav-link-danger">Logout</a>
                 {% else %}
                     <a href="/" class="nav-link">Home</a>
+                    <a href="#about" class="nav-link">About</a>
+                    <a href="#features" class="nav-link">Features</a>
+                    <a href="#contact" class="nav-link">Contact</a>
                     <a href="/login" class="nav-link">Login</a>
                     <a href="/register" class="nav-link nav-link-primary">Register</a>
                 {% endif %}
@@ -55,17 +59,38 @@
 
         {% block page_header %}{% endblock %}
 
+        {% block page_content %}
         <section class="content-shell {% block content_class %}content-card{% endblock %}">
             {% block content %}{% endblock %}
         </section>
+        {% endblock %}
     </main>
 
     <footer class="site-footer">
         <div class="footer-content">
-            <p class="footer-brand">ChronoFinance</p>
+            <p class="footer-brand">ChronoFinance © 2026</p>
             <p class="footer-text">Built by Kartik and Awanti</p>
         </div>
     </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const reveals = document.querySelectorAll(".reveal");
+
+            function revealOnScroll() {
+                reveals.forEach((el) => {
+                    const rect = el.getBoundingClientRect();
+                    const visiblePoint = 120;
+                    if (rect.top < window.innerHeight - visiblePoint) {
+                        el.classList.add("active");
+                    }
+                });
+            }
+
+            revealOnScroll();
+            window.addEventListener("scroll", revealOnScroll);
+        });
+    </script>
 
 </body>
 </html>

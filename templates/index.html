@@ -1,68 +1,217 @@
 {% extends "base.html" %}
 
-{% block title %}ChronoFinance{% endblock %}
+{% block title %}ChronoFinance | Smart Personal Finance Tracker{% endblock %}
+{% block body_class %}landing-page{% endblock %}
 
-{% block content %}
-<section class="hero-section cred-hero">
-    <div class="hero-copy">
-        <p class="eyebrow">all your money. one elegant place.</p>
-        <h1 class="hero-title">track money<br>the premium way.</h1>
-        <p class="hero-subtitle">
-            ChronoFinance helps you manage income, expenses, reports, and time travel queries
-            with a clean luxury dashboard experience.
-        </p>
+{% block page_content %}
+<section class="hero-section reveal">
+    <div class="hero-container">
+        <div class="hero-left">
+            <p class="hero-tag">ALL YOUR MONEY. ONE ELEGANT PLACE.</p>
+            <h1>track money<br>the premium<br>way.</h1>
+            <p class="hero-subtext">
+                ChronoFinance helps you manage income, expenses, reports, and financial history
+                with a clean luxury dashboard experience.
+            </p>
 
-        <div class="action-row hero-actions">
-            <a href="/register" class="btn btn-light">Get Started</a>
-            <a href="/login" class="btn btn-ghost">Login</a>
-        </div>
-    </div>
-
-    <div class="hero-visual">
-        <div class="phone-mock">
-            <div class="mock-top"></div>
-            <div class="mock-card glow-card">
-                <span class="mock-label">Current Balance</span>
-                <h3>₹ 48,560</h3>
-                <p>updated live with your transactions</p>
+            <div class="hero-buttons">
+                <a href="{{ url_for('register') }}" class="btn-primary">Get Started</a>
+                <a href="{{ url_for('login') }}" class="btn-secondary">Login</a>
             </div>
-            <div class="mock-grid">
-                <div class="mini-dark-card">
-                    <span>Income</span>
-                    <strong>₹ 72,000</strong>
+        </div>
+
+        <div class="hero-right">
+            <div class="phone-card">
+                <div class="phone-notch"></div>
+
+                <div class="balance-card">
+                    <p>Current Balance</p>
+                    <h2>₹ 48,560</h2>
+                    <span>updated live with your transactions</span>
                 </div>
-                <div class="mini-dark-card">
-                    <span>Expense</span>
-                    <strong>₹ 23,440</strong>
+
+                <div class="mini-cards">
+                    <div class="mini-card">
+                        <p>Income</p>
+                        <h3>₹ 72,000</h3>
+                    </div>
+                    <div class="mini-card">
+                        <p>Expense</p>
+                        <h3>₹ 23,440</h3>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<section class="feature-grid premium-feature-grid">
-    <div class="feature-card dark-feature-card">
-        <span class="feature-number">01</span>
-        <h3>Track everything</h3>
-        <p>View income, expense, savings, balance, and monthly performance in one place.</p>
-    </div>
+<div class="wave-divider">
+    <svg viewBox="0 0 1440 160" preserveAspectRatio="none">
+        <path d="M0,64 C180,150 360,0 540,64 C720,128 900,170 1080,106 C1260,42 1350,64 1440,96 L1440,160 L0,160 Z"></path>
+    </svg>
+</div>
 
-    <div class="feature-card dark-feature-card">
-        <span class="feature-number">02</span>
-        <h3>Time travel query</h3>
-        <p>Go back to any date and understand where your money stood at that moment.</p>
+<section class="about-section reveal" id="about">
+    <div class="section-container">
+        <div class="section-heading">
+            <p class="section-tag">ABOUT</p>
+            <h2>What is ChronoFinance?</h2>
+            <p>
+                ChronoFinance is a personal finance web app designed to help users track income,
+                expenses, categories, reports, and financial goals in one modern dashboard.
+                It combines elegant design with useful analytics so managing money feels simple,
+                smart, and premium.
+            </p>
+        </div>
     </div>
+</section>
 
-    <div class="feature-card dark-feature-card">
-        <span class="feature-number">03</span>
-        <h3>Elegant reports</h3>
-        <p>Generate clean monthly summaries and category-based insights quickly.</p>
+<div class="wave-divider wave-divider-soft">
+    <svg viewBox="0 0 1440 160" preserveAspectRatio="none">
+        <path d="M0,96 C190,24 360,140 540,96 C720,52 900,0 1080,64 C1260,128 1350,110 1440,84 L1440,160 L0,160 Z"></path>
+    </svg>
+</div>
+
+<section class="features-section reveal" id="features">
+    <div class="section-container">
+        <div class="section-heading center">
+            <p class="section-tag">FEATURES</p>
+            <h2>Everything you need to manage your finances</h2>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">💸</div>
+                <h3>Track Income & Expenses</h3>
+                <p>Add and manage all your daily financial transactions with ease and clarity.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Smart Dashboard</h3>
+                <p>See balance, income, expense summaries, and category insights instantly.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🧾</div>
+                <h3>Download Reports</h3>
+                <p>Generate clean reports for better analysis, records, and monthly review.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🕒</div>
+                <h3>Time Travel Query</h3>
+                <p>Check your financial status on a past date and review previous transactions.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🗂️</div>
+                <h3>Category Management</h3>
+                <p>Organize transactions by category for clearer spending analysis.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <h3>Responsive Design</h3>
+                <p>Use ChronoFinance smoothly on desktop, tablet, and mobile devices.</p>
+            </div>
+        </div>
     </div>
+</section>
 
-    <div class="feature-card dark-feature-card">
-        <span class="feature-number">04</span>
-        <h3>Premium dashboard</h3>
-        <p>Minimal dark visuals, smart insights, and a focused finance experience.</p>
+<div class="wave-divider">
+    <svg viewBox="0 0 1440 160" preserveAspectRatio="none">
+        <path d="M0,80 C180,20 320,150 520,90 C720,30 910,20 1100,86 C1260,138 1360,116 1440,96 L1440,160 L0,160 Z"></path>
+    </svg>
+</div>
+
+<section class="contact-section reveal" id="contact">
+    <div class="section-container">
+        <div class="contact-header">
+            <p class="section-tag">CONTACT</p>
+            <h2>Let’s build something better together.</h2>
+            <p class="contact-header-text">
+                Have feedback, ideas, or improvements for ChronoFinance? Reach out and let’s make
+                the platform even better.
+            </p>
+        </div>
+
+        <div class="contact-wrapper">
+            <div class="contact-left">
+                <div class="contact-info-card">
+                    <div class="contact-info-icon">
+                        <i class="fa-solid fa-wallet"></i>
+                    </div>
+                    <div>
+                        <h3>ChronoFinance</h3>
+                        <p>A premium personal finance tracker built for smart money management.</p>
+                    </div>
+                </div>
+
+                <div class="contact-info-list">
+                    <div class="contact-info-item">
+                        <span class="contact-badge"><i class="fa-solid fa-user"></i></span>
+                        <div>
+                            <h4>Developer</h4>
+                            <p>Kartik Wagh</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-info-item">
+                        <span class="contact-badge"><i class="fa-solid fa-envelope"></i></span>
+                        <div>
+                            <h4>Email</h4>
+                            <p>chronofinance@gmail.com</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-info-item">
+                        <span class="contact-badge"><i class="fa-solid fa-location-dot"></i></span>
+                        <div>
+                            <h4>Location</h4>
+                            <p>Pune, India</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-note">
+                    <p>
+                        Whether you have ideas for new features, UI improvements, or general feedback
+                        about the project, your message is always welcome.
+                    </p>
+                </div>
+            </div>
+
+            <div class="contact-right">
+                <form class="contact-form" method="POST" action="{{ url_for('contact') }}">
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label for="name">Your Name</label>
+                            <input type="text" id="name" name="name" placeholder="Enter your name" required>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="email">Your Email</label>
+                            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="subject">Subject</label>
+                        <input type="text" id="subject" name="subject" placeholder="What is this about?">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="message">Your Message</label>
+                        <textarea id="message" name="message" rows="6" placeholder="Write your message here..." required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-primary full-width">
+                        <i class="fa-solid fa-paper-plane"></i>&nbsp; Send Message
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 </section>
 {% endblock %}

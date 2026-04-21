@@ -85,3 +85,24 @@ if __name__ == "__main__":
     init_db()
     print("Database and tables created successfully.")
     
+
+import sqlite3
+
+conn = sqlite3.connect("chronofinance.db")
+cursor = conn.cursor()
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS feedback_messages (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    subject TEXT,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+""")
+
+conn.commit()
+conn.close()
+
+print("Feedback table created successfully.")
