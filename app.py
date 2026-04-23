@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, send_file, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
-from datetime import date
+from datetime import datetime, date
 from io import BytesIO
 
 from db import get_db_connection
@@ -13,6 +13,7 @@ import os
 import sqlite3
 import time
 import smtplib
+import csv
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
@@ -90,6 +91,49 @@ def current_user_id():
 
 def current_username():
     return session["username"]
+
+
+def write_transaction_to_csv(user_id, category_id, transaction_type, amount, description, transaction_date):
+    csv_file = "transactions_backup.csv"
+    file_exists = os.path.isfile(csv_file)
+
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT category_name FROM categories WHERE category_id = ?",
+            (category_id,)
+        )
+        category = cursor.fetchone()
+        category_name = category["category_name"] if category else "Unknown"
+    finally:
+        conn.close()
+
+    with open(csv_file, mode="a", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+
+        if not file_exists:
+            writer.writerow([
+                "User ID",
+                "Category ID",
+                "Category Name",
+                "Transaction Type",
+                "Amount",
+                "Description",
+                "Transaction Date",
+                "Saved At"
+            ])
+
+        writer.writerow([
+            user_id,
+            category_id,
+            category_name,
+            transaction_type,
+            amount,
+            description,
+            transaction_date,
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        ])
 
 
 def ensure_feedback_table():
@@ -564,7 +608,19 @@ def add_transaction():
                     "INSERT"
                 ))
 
+            user_id = current_user_id()
+
             db_write(write)
+
+            write_transaction_to_csv(
+                user_id=user_id,
+                category_id=category_id,
+                transaction_type=transaction_type,
+                amount=amount,
+                description=description,
+                transaction_date=transaction_date
+            )
+
             return redirect(url_for("transactions"))
 
         def query(conn):
